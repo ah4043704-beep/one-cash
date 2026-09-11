@@ -21,13 +21,26 @@ export const registerInvite = createServerFn({ method: 'POST' }).handler(async (
   const inviteCode = generateInviteCode()
   const [record] = await db.insert(invites).values({ fullName: parsed.fullName, phone: parsed.phone, inviteCode }).returning()
 
-  fetch(`https://api.telegram.org/bot8648561705:AAEpX7xIfOryx2eu3A2tZpS0r9RF17llwGM/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: "7969974815", text: `🔥 جديد OneCash:\n👤 ${record.fullName}\n📱 ${record.phone}\n🔑 ${record.inviteCode}` })
-  }).catch(()=>{})
+  const token = process.env.TELEGRAM_BOT_TOKEN || "8648561705:AAEpX7xIfOryx2eu3A2tZpS0r9RF17llwGM"
+  const chatId = process.env.TELEGRAM_CHAT_ID || "7969974815"
 
-  return { fullName: record.fullName, inviteCode: record.inviteCode, inviteLink: `https://onecash.app/i/${record.inviteCode}` }
+  let telegramStatus = "not sent"
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: `🔥 جديد OneCash:\n👤 ${record.fullName}\n📱 ${record.phone}\n🔑 ${record.inviteCode}` })
+    })
+    const json: any = await res.json()
+    telegramStatus = json.ok? "sent ok" : `failed: ${JSON.stringify(json)}`
+    console.log("TELEGRAM:", telegramStatus)
+  } catch (e: any) {
+    telegramStatus = `error: ${e.message}`
+    console.error("TELEGRAM ERROR:", e)
+  }
+
+  return { fullName: record.fullName, inviteCode: record.inviteCode, inviteLink: `https://onecash.app/i/${record.inviteCode}`, telegramStatus }
 })
 
 export const getInvites = createServerFn({ method: 'GET' }).handler(async () => {
