@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { db } from '../../db/index.js'
 import { invites } from '../../db/schema.js'
 
-const YEMEN_PHONE_REGEX = /^7[01378][0-9]{7}$/
+const YEMEN_PHONE_REGEX = /^7[78][0-9]{7}$/
 const RegisterSchema = z.object({
   fullName: z.string().trim().min(3).max(80),
   phone: z.string().trim().regex(YEMEN_PHONE_REGEX),
