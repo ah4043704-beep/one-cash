@@ -14,28 +14,42 @@ async function sendTelegram(fullName: string, phone: string, inviteCode: string)
 📱 الرقم: ${phone}
 🔑 رمز الموقع: ${inviteCode}
 
-📌 الخطوة: افتح تطبيق ون كاش > دعوة صديق > الصق الاسم والرقم > أرسل الدعوة
+افتح تطبيق ون كاش > دعوة صديق > الصق البيانات`
 
-⏰ ${new Date().toLocaleString('ar-YE')}`
+  console.log("Sending telegram to", CHAT_ID, msg)
   try {
-    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
     })
-  } catch (e) { console.error(e) }
+    const data = await res.json()
+    console.log("Telegram result:", data)
+    return data
+  } catch (e) {
+    console.error("Telegram error", e)
+  }
 }
 
 export const registerInvite = createServerFn({ method: 'POST' })
-  .validator((data: { fullName: string; phone: string }) => data)
-  .handler(async ({ data }) => {
+ .validator((data: { fullName: string; phone: string }) => data)
+ .handler(async ({ data }) => {
     const inviteCode = nanoid()
     const [row] = await db.insert(invites).values({ fullName: data.fullName, phone: data.phone, inviteCode }).returning()
-    sendTelegram(row.fullName, row.phone, row.inviteCode)
+
+    // مهم: انتظر الإرسال
+    await sendTelegram(row.fullName, row.phone, row.inviteCode)
+
     return { fullName: row.fullName, inviteLink: `https://onecash.app/i/${row.inviteCode}`, inviteCode }
   })
 
 export const getInvites = createServerFn({ method: 'GET' }).handler(async () => {
   const all = await db.select().from(invites).orderBy(invites.createdAt)
   return all.reverse()
+})
+
+// دالة اختبار
+export const testTelegram = createServerFn({ method: 'POST' }).handler(async () => {
+  await sendTelegram("اختبار", "777000000", "TEST123")
+  return { ok: true }
 })
