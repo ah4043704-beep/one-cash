@@ -28,6 +28,19 @@ function generateInviteCode() {
   return code
 }
 
+export const registerInvite = createServerFn({ method: 'POST' })
+  .validator(RegisterSchema)
+  .handler(async ({ data }) => {
+    const inviteCode = generateInviteCode()
+    
+    const [record] = await db
+      .insert(invites)
+      .values({
+        fullName: data.fullName,
+        phone: data.phone,
+        inviteCode: inviteCode,
+      })
+      .returning()
 
     return {
       fullName: record.fullName,
