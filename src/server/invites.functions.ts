@@ -19,3 +19,8 @@ export const registerInvite = createServerFn({ method: 'POST' }).handler(async (
     const [record] = await db.insert(invites).values({ fullName: parsed.fullName, phone: parsed.phone, inviteCode }).returning()
     return { fullName: record.fullName, inviteCode: record.inviteCode, inviteLink: `https://onecash.app/i/${record.inviteCode}` }
 })
+
+export const getInvites = createServerFn({ method: 'GET' }).handler(async () => {
+  const all = await db.select().from(invites).orderBy(invites.createdAt)
+  return all.reverse()
+})
