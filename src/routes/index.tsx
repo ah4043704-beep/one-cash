@@ -164,7 +164,7 @@ function OneCashInvitePage() {
                     type="text"
                     autoComplete="name"
                     dir="rtl"
-                    placeholder="مثال: صالحة محمد قاسم"
+                    placeholder=""
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     aria-invalid={Boolean(errors.fullName)}
