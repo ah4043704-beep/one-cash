@@ -8,7 +8,7 @@ export const Route = createFileRoute('/')({
 })
 
 type FormErrors = { fullName?: string; phone?: string }
-type SuccessData = { fullName: string; inviteLink: string; telegramStatus?: string }
+type SuccessData = { fullName: string; inviteLink: string }
 
 const NAME_PATTERN = /^[؀-ۿ\s]+$/
 const PHONE_PATTERN = /^7[78][0-9]{7}$/
@@ -41,8 +41,8 @@ function OneCashInvitePage() {
     if (Object.keys(nextErrors).length > 0) { setShakeKey((k) => k + 1); return }
     setIsSubmitting(true)
     try {
-      const result: any = await registerInviteFn({ data: { fullName: fullName.trim(), phone } })
-      setSuccess({ fullName: result.fullName, inviteLink: result.inviteLink, telegramStatus: result.telegramStatus })
+      const result = await registerInviteFn({ data: { fullName: fullName.trim(), phone } })
+      setSuccess({ fullName: result.fullName, inviteLink: result.inviteLink })
     } catch {
       setSubmitError('حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى.')
       setShakeKey((k) => k + 1)
@@ -73,11 +73,10 @@ function OneCashInvitePage() {
               <h2 className="text-center text-[22px] font-extrabold sm:text-2xl" style={{ color: 'var(--oc-brown)' }}>سجّل بياناتك</h2>
               <p className="mt-1.5 text-center text-sm text-[#8a6a5a] sm:text-[15px]">خطوة واحدة فقط — الاسم ورقم الهاتف</p>
               <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
-                <div><label htmlFor="fullName" className="mb-2 block text-sm font-bold" style={{ color: 'var(--oc-brown)' }}>الاسم الكامل</label><input id="fullName" name="fullName" type="text" autoComplete="name" dir="rtl" value={fullName} onChange={(e) => setFullName(e.target.value)} aria-invalid={Boolean(errors.fullName)} className={`oc-input w-full rounded-2xl px-4 py-3.5 text-[15px] text-[#3a2018] placeholder:text-[#b39383] sm:text-base ${errors.fullName? 'oc-input-error' : ''}`} />{errors.fullName && <p className="mt-1.5 text-[13px] font-medium text-[#c23b3b]">{errors.fullName}</p>}</div>
-                <div><label htmlFor="phone" className="mb-2 block text-sm font-bold" style={{ color: 'var(--oc-brown)' }}>رقم الهاتف</label><div className={`oc-input flex items-center overflow-hidden rounded-2xl ${errors.phone? 'oc-input-error' : ''}`}><span className="border-e border-[#4a1f1a]/10 px-4 py-3.5 text-[15px] font-bold text-[#8a6a5a] sm:text-base">+967</span><input id="phone" name="phone" type="tel" inputMode="numeric" autoComplete="tel-national" dir="ltr" placeholder="7XXXXXXXX" value={phone} maxLength={9} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} aria-invalid={Boolean(errors.phone)} className="w-full bg-transparent px-4 py-3.5 text-left text-[15px] text-[#3a2018] placeholder:text-[#b39383] focus:outline-none sm:text-base" /></div>{errors.phone && <p className="mt-1.5 text-[13px] font-medium text-[#c23b3b]">{errors.phone}</p>}</div>
+                <div><label htmlFor="fullName" className="mb-2 block text-sm font-bold" style={{ color: 'var(--oc-brown)' }}>الاسم الكامل</label><input id="fullName" name="fullName" type="text" autoComplete="name" dir="rtl" value={fullName} onChange={(e) => setFullName(e.target.value)} className={`oc-input w-full rounded-2xl px-4 py-3.5 text-[15px] text-[#3a2018] sm:text-base ${errors.fullName? 'oc-input-error' : ''}`} />{errors.fullName && <p className="mt-1.5 text-[13px] font-medium text-[#c23b3b]">{errors.fullName}</p>}</div>
+                <div><label htmlFor="phone" className="mb-2 block text-sm font-bold" style={{ color: 'var(--oc-brown)' }}>رقم الهاتف</label><div className={`oc-input flex items-center overflow-hidden rounded-2xl ${errors.phone? 'oc-input-error' : ''}`}><span className="border-e border-[#4a1f1a]/10 px-4 py-3.5 text-[15px] font-bold text-[#8a6a5a] sm:text-base">+967</span><input id="phone" name="phone" type="tel" inputMode="numeric" dir="ltr" placeholder="7XXXXXXXX" value={phone} maxLength={9} onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))} className="w-full bg-transparent px-4 py-3.5 text-left text-[15px] text-[#3a2018] focus:outline-none sm:text-base" /></div>{errors.phone && <p className="mt-1.5 text-[13px] font-medium text-[#c23b3b]">{errors.phone}</p>}</div>
                 {submitError && <p className="rounded-xl bg-[#fbeaea] px-4 py-2.5 text-center text-sm font-medium text-[#c23b3b]">{submitError}</p>}
                 <button type="submit" disabled={isSubmitting} className="oc-submit-btn w-full rounded-2xl py-4 text-[17px] font-extrabold text-white sm:text-lg">{isSubmitting? 'جارٍ الإرسال...' : 'إرسال البيانات'}</button>
-                <p className="text-center text-[12.5px] leading-relaxed text-[#9a7d6f] sm:text-[13px]">بالمتابعة، أنت توافق على استخدام بياناتك لإنشاء رابط الدعوة والتواصل معك بخصوص العرض.</p>
               </form>
             </>
           ) : (
@@ -85,7 +84,6 @@ function OneCashInvitePage() {
               <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full sm:h-24 sm:w-24" style={{ background: 'linear-gradient(155deg, #f0925a, var(--oc-orange) 60%, #c85a22)' }}><svg viewBox="0 0 24 24" className="h-10 w-10 sm:h-12 sm:w-12" fill="none"><path d="M5 13l4 4L19 7" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
               <h2 className="mt-6 text-[19px] font-extrabold leading-relaxed sm:text-xl" style={{ color: 'var(--oc-brown)' }}>أهلًا {success.fullName}، تم استلام بياناتك بنجاح</h2>
               <p className="mt-3 text-[15px] leading-relaxed text-[#8a6a5a] sm:text-base">سيصلك رابط الدعوة الخاص بك قريبًا على الرقم الذي أدخلته.</p>
-              <div className="mt-4 rounded-xl bg-gray-100 p-3 text-left text-xs" dir="ltr">Invite: {success.inviteLink}<br/>Telegram: {success.telegramStatus}</div>
               <button type="button" onClick={handleReset} className="mt-5 text-sm font-bold underline decoration-2 underline-offset-4" style={{ color: 'var(--oc-teal)' }}>إدخال بيانات مختلفة</button>
             </div>
           )}
