@@ -17,6 +17,7 @@ function generateInviteCode() {
 }
 
 export const registerInvite = createServerFn({ method: 'POST' }).handler(async ({ data }: { data: any }) => {
+  console.log("INVITE REQUEST:", data)
   const parsed = RegisterSchema.parse(data)
   const inviteCode = generateInviteCode()
   const [record] = await db.insert(invites).values({ fullName: parsed.fullName, phone: parsed.phone, inviteCode }).returning()
@@ -24,29 +25,33 @@ export const registerInvite = createServerFn({ method: 'POST' }).handler(async (
   const token = process.env.TELEGRAM_BOT_TOKEN
   const chatId = process.env.TELEGRAM_CHAT_ID || "7969974815"
 
-  console.log("DEBUG TOKEN EXISTS:",!!token)
-  console.log("DEBUG CHAT_ID:", chatId)
+  let telegramStatus = "no token"
 
   if (token) {
     try {
+      console.log("SENDING TO TELEGRAM...")
       const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chat_id: chatId, text: `🔥 جديد OneCash:\n👤 ${record.fullName}\n📱 ${record.phone}\n🔑 ${record.inviteCode}` })
       })
-      const json = await res.json()
-      console.log("TELEGRAM RESULT:", JSON.stringify(json))
-    } catch (e) {
-      console.error("TELEGRAM ERROR:", e)
-    }
-  } else {
-    console.error("NO TOKEN FOUND IN ENV!")
-  }
+      const json: any = await res.json()
+      console.log("TELEGRAM JSON:", JSON.stringify(json))
+      telegramStatus = json.ok? "sent ok" : `
 
-  return { fullName: record.fullName, inviteCode: record.inviteCode, inviteLink: `https://onecash.app/i/${record.inviteCode}` }
-})
 
-export const getInvites = createServerFn({ method: 'GET' }).handler(async () => {
-  const all = await db.select().from(invites).orderBy(invites.createdAt)
-  return all.reverse()
-})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
