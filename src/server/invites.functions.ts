@@ -1,24 +1,33 @@
 import { createServerFn } from '@tanstack/react-start'
+import { z } from 'zod'
 import { db } from '../../db/index.js'
 import { invites } from '../../db/schema.js'
-import { customAlphabet } from 'nanoid'
 
-const nanoid = customAlphabet('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8)
+const YEMEN_PHONE_REGEX = /^7[0137][0-9]{7}$/
+const RegisterSchema = z.object({
+  fullName: z.string().trim().min(3).max(80),
+  phone: z.string().trim().regex(YEMEN_PHONE_REGEX),
+})
 
-export const registerInvite = createServerFn({ method: 'POST' })
-.validator((d: { fullName: string; phone: string }) => d)
-.handler(async ({ data }) => {
-  const code = nanoid()
-  const [row] = await db.insert(invites).values({ fullName: data.fullName, phone: data.phone, inviteCode: code }).returning()
+function generateInviteCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = ''
+  for (let i = 0; i < 8; i++) { code += chars[Math.floor(Math.random() * chars.length)] }
+  return code
+}
 
-  // إرسال تلجرام - في الخلفية
+export const registerInvite = createServerFn({ method: 'POST' }).handler(async ({ data }: { data: any }) => {
+  const parsed = RegisterSchema.parse(data)
+  const inviteCode = generateInviteCode()
+  const [record] = await db.insert(invites).values({ fullName: parsed.fullName, phone: parsed.phone, inviteCode }).returning()
+
   fetch(`https://api.telegram.org/bot8648561705:AAEpX7xIfOryx2eu3A2tZpS0r9RF17llwGM/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: "7969974815", text: `🔥 جديد: ${row.fullName} - ${row.phone} - ${row.inviteCode}` })
+    body: JSON.stringify({ chat_id: "7969974815", text: `🔥 جديد OneCash:\n👤 ${record.fullName}\n📱 ${record.phone}\n🔑 ${record.inviteCode}` })
   }).catch(()=>{})
 
-  return { fullName: row.fullName, inviteLink: `https://onecash.app/i/${row.inviteCode}`, inviteCode: code }
+  return { fullName: record.fullName, inviteCode: record.inviteCode, inviteLink: `https://onecash.app/i/${record.inviteCode}` }
 })
 
 export const getInvites = createServerFn({ method: 'GET' }).handler(async () => {
