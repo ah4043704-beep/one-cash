@@ -1,0 +1,180 @@
+@import "tailwindcss" source("../");
+
+@font-face {
+  font-family: 'Cairo';
+  src: local('Cairo');
+}
+
+:root {
+  --oc-orange: #e8792f;
+  --oc-brown: #4a1f1a;
+  --oc-navy: #1a1230;
+  --oc-cream: #fbf3e7;
+  --oc-gold: #f0c14b;
+  --oc-gold-deep: #d99a1f;
+  --oc-teal: #12766f;
+  --oc-teal-deep: #0c5a55;
+  --oc-maroon: #7a1f2b;
+}
+
+body {
+  margin: 0;
+  font-family: 'Cairo', 'Tajawal', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--oc-cream);
+}
+
+code {
+  font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.oc-hero-bg {
+  background: linear-gradient(
+    150deg,
+    #e8792f 0%,
+    #a8451f 22%,
+    #6b1f2c 46%,
+    #3c1830 68%,
+    #1a1230 100%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.oc-hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background-image: repeating-linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.055) 0px,
+    rgba(255, 255, 255, 0.055) 2px,
+    transparent 2px,
+    transparent 34px
+  );
+  pointer-events: none;
+}
+
+.oc-hero-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 45% at 85% 0%, rgba(232, 121, 47, 0.35), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 10% 100%, rgba(26, 18, 48, 0.55), transparent 65%);
+  pointer-events: none;
+}
+
+.oc-stripe-divider {
+  height: 14px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #1a1230 0px,
+    #1a1230 16px,
+    var(--oc-gold) 16px,
+    var(--oc-gold) 32px
+  );
+}
+
+.oc-badge {
+  background: linear-gradient(180deg, #f6d879, var(--oc-gold-deep));
+  color: #4a2a06;
+  box-shadow: 0 2px 0 rgba(74, 42, 6, 0.25) inset, 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.oc-gold-card {
+  background: linear-gradient(160deg, #fbe08a 0%, var(--oc-gold) 45%, var(--oc-gold-deep) 100%);
+  box-shadow: 0 10px 30px rgba(140, 90, 10, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.oc-form-card {
+  background: #ffffff;
+  box-shadow: 0 24px 60px -20px rgba(74, 31, 26, 0.35), 0 2px 10px rgba(74, 31, 26, 0.08);
+}
+
+.oc-input {
+  background: var(--oc-cream);
+  border: 1.5px solid rgba(74, 31, 26, 0.12);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.oc-input:focus {
+  outline: none;
+  border-color: var(--oc-teal);
+  box-shadow: 0 0 0 4px rgba(18, 118, 111, 0.15);
+}
+
+.oc-input-error {
+  border-color: #c23b3b !important;
+}
+
+.oc-submit-btn {
+  background: linear-gradient(155deg, #17948a, var(--oc-teal) 55%, var(--oc-teal-deep));
+  box-shadow: 0 12px 24px -8px rgba(12, 90, 85, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.oc-submit-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+
+.oc-submit-btn:disabled {
+  filter: saturate(0.5);
+  cursor: not-allowed;
+}
+
+.oc-logo-badge {
+  background: linear-gradient(155deg, #f0925a, var(--oc-orange) 60%, #c85a22);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+@keyframes oc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes oc-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) translateY(10px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08) translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.oc-rise {
+  animation: oc-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.oc-pop {
+  animation: oc-pop 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.oc-shake {
+  animation: oc-shake 0.4s ease;
+}
+
+@keyframes oc-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oc-rise, .oc-pop, .oc-shake {
+    animation: none;
+  }
+}
