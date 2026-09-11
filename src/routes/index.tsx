@@ -18,7 +18,7 @@ type SuccessData = {
 }
 
 const NAME_PATTERN = /^[؀-ۿ\s]+$/
-const PHONE_PATTERN = /^7[0137][0-9]{7}$/
+const PHONE_PATTERN = /^7[78][0-9]{7}$/
 
 function validate(fullName: string, phone: string): FormErrors {
   const errors: FormErrors = {}
